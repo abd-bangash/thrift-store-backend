@@ -8,6 +8,7 @@ const {
   sendOtp,
   verifyOtp,
   getUserProfile,
+  updateUser,
 } = require("../controllers/user.controller");
 const { userAuthMiddleware } = require("../middlewares/auth.midleware");
 
@@ -64,6 +65,8 @@ router.post(
   ],
   resetPassword
 );
+
+router.put("/profile", userAuthMiddleware, updateUser);
 
 router.get("/profile", userAuthMiddleware, getUserProfile);
 

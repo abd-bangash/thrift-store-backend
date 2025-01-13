@@ -145,3 +145,28 @@ module.exports.resetPassword = async (req, res, next) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+//update profile info
+module.exports.updateUser = async (req, res, next) => {
+  try {
+    const { userName, email, password } = req.body;
+
+    const user = await userModel.findById(req.user._id);
+    if (!user) return res.status(400).json({ message: "User not found" });
+
+    if (userName) user.userName = userName;
+    if (email) user.email = email;
+    if (password) {
+      const hashedPassword = userModel.hashPassword(password);
+      user.password = hashedPassword;
+    }
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ message: "User info updated successfully", user });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
