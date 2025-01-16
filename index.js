@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const userRoutes = require("./routes/user.routes");
+const productRoutes = require("./routes/product.routes");
 const adminRoutes = require("./routes/admin.routes");
 
 const port = process.env.PORT || 5000;
@@ -24,6 +25,7 @@ mongoose
   .catch((e) => console.log(e));
 
 app.use("/api/user", userRoutes);
+app.use("/api/product", productRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.get("/", (req, res) => {

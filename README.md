@@ -1,203 +1,378 @@
-# Thrift Store Backend
+# Thrift Store Backend API Documentation
 
-This is the backend for the Thrift Store application. Below are the routes available along with examples of the data to be sent and received.
+## Table of Contents
 
-## User Routes
+## API Documentation
 
 ### Register User
 
-**Endpoint:** `POST /api/user/register`
+- **Endpoint:** `/register`
+- **Method:** `POST`
+- **Body:**
+  ```json
+  {
+    "username": "string",
+    "email": "string",
+    "password": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "User registered successfully",
+    "user": {
+      "id": "string",
+      "username": "string",
+      "email": "string"
+    }
+  }
+  ```
 
-**Request Body:**
+### Login
 
-```json
-{
-  "userName": "exampleUser",
-  "email": "example@example.com",
-  "password": "examplePassword",
-  "role": "user"
-}
-```
+- **Endpoint:** `/login`
+- **Method:** `POST`
+- **Body:**
+  ```json
+  {
+    "email": "string",
+    "password": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "Login successful",
+    "token": "string"
+  }
+  ```
 
-**Response:**
+### Logout (Logged in users only)
 
-```json
-{
-  "user": {
-    "_id": "userId",
-    "userName": "exampleUser",
-    "email": "example@example.com",
-    "role": "user"
-  },
-  "token": "jwtToken"
-}
-```
-
-### Login User
-
-**Endpoint:** `POST /api/user/login`
-
-**Request Body:**
-
-```json
-{
-  "email": "example@example.com",
-  "password": "examplePassword"
-}
-```
-
-**Response:**
-
-```json
-{
-  "user": {
-    "_id": "userId",
-    "userName": "exampleUser",
-    "email": "example@example.com",
-    "role": "user"
-  },
-  "token": "jwtToken"
-}
-```
-
-### Get User Profile
-
-**Endpoint:** `GET /api/user/profile`
-
-**Headers:**
-
-```
-Authorization: Bearer jwtToken
-```
-
-**Response:**
-
-```json
-{
-  "_id": "userId",
-  "userName": "exampleUser",
-  "email": "example@example.com",
-  "role": "user"
-}
-```
+- **Endpoint:** `/logout`
+- **Method:** `POST`
+- **Headers:**
+  ```json
+  {
+    "Authorization": "Bearer <token>"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "Logout successful"
+  }
+  ```
 
 ### Forgot Password
 
-**Endpoint:** `POST /api/user/forgot-password`
-
-**Request Body:**
-
-```json
-{
-  "email": "example@example.com"
-}
-```
-
-**Response:**
-
-```json
-{
-  "message": "OTP sent successfully"
-}
-```
+- **Endpoint:** `/forgot-password`
+- **Method:** `POST`
+- **Body:**
+  ```json
+  {
+    "email": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "OTP sent to email"
+  }
+  ```
 
 ### Verify OTP
 
-**Endpoint:** `POST /api/user/verify-otp`
-
-**Request Body:**
-
-```json
-{
-  "email": "example@example.com",
-  "otp": "123456"
-}
-```
-
-**Response:**
-
-```json
-{
-  "message": "OTP verified"
-}
-```
+- **Endpoint:** `/verify-otp`
+- **Method:** `POST`
+- **Body:**
+  ```json
+  {
+    "email": "string",
+    "otp": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "OTP verified"
+  }
+  ```
 
 ### Reset Password
 
-**Endpoint:** `POST /api/user/reset-password`
+- **Endpoint:** `/reset-password`
+- **Method:** `POST`
+- **Body:**
+  ```json
+  {
+    "email": "string",
+    "otp": "string",
+    "newPassword": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "Password reset successful"
+  }
+  ```
 
-**Request Body:**
+### Get Profile (Logged in users only)
 
-```json
-{
-  "email": "example@example.com",
-  "otp": "123456",
-  "newPassword": "newExamplePassword"
-}
-```
+- **Endpoint:** `/profile`
+- **Method:** `GET`
+- **Headers:**
+  ```json
+  {
+    "Authorization": "Bearer <token>"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "user": {
+      "id": "string",
+      "username": "string",
+      "email": "string",
+      "profile": {
+        "firstName": "string",
+        "lastName": "string",
+        "address": "string",
+        "phone": "string"
+      }
+    }
+  }
+  ```
 
-**Response:**
+### Update Profile (Logged in users only)
 
-```json
-{
-  "message": "Password changed successfully"
-}
-```
+- **Endpoint:** `/profile`
+- **Method:** `PUT`
+- **Headers:**
+  ```json
+  {
+    "Authorization": "Bearer <token>"
+  }
+  ```
+- **Body:**
+  ```json
+  {
+    "firstName": "string",
+    "lastName": "string",
+    "address": "string",
+    "phone": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "Profile updated successfully",
+    "profile": {
+      "firstName": "string",
+      "lastName": "string",
+      "address": "string",
+      "phone": "string"
+    }
+  }
+  ```
+
+### Add Product (Logged in users only)
+
+- **Endpoint:** `/products`
+- **Method:** `POST`
+- **Headers:**
+  ```json
+  {
+    "Authorization": "Bearer <token>"
+  }
+  ```
+- **Body:**
+  ```json
+  {
+    "name": "string",
+    "description": "string",
+    "price": "number",
+    "category": "string",
+    "image": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "Product added successfully",
+    "product": {
+      "id": "string",
+      "name": "string",
+      "description": "string",
+      "price": "number",
+      "category": "string",
+      "image": "string"
+    }
+  }
+  ```
+
+### Get All Products
+
+- **Endpoint:** `/products`
+- **Method:** `GET`
+- **Response:**
+  ```json
+  {
+    "products": [
+      {
+        "id": "string",
+        "name": "string",
+        "description": "string",
+        "price": "number",
+        "category": "string",
+        "image": "string"
+      }
+    ]
+  }
+  ```
+
+### Get Product by ID
+
+- **Endpoint:** `/products/:id`
+- **Method:** `GET`
+- **Response:**
+  ```json
+  {
+    "product": {
+      "id": "string",
+      "name": "string",
+      "description": "string",
+      "price": "number",
+      "category": "string",
+      "image": "string"
+    }
+  }
+  ```
+
+### Get Product by Category
+
+- **Endpoint:** `/products/category/:category`
+- **Method:** `GET`
+- **Response:**
+  ```json
+  {
+    "products": [
+      {
+        "id": "string",
+        "name": "string",
+        "description": "string",
+        "price": "number",
+        "category": "string",
+        "image": "string"
+      }
+    ]
+  }
+  ```
+
+### Get All Categories
+
+- **Endpoint:** `/categories`
+- **Method:** `GET`
+- **Response:**
+  ```json
+  {
+    "categories": [
+      {
+        "id": "string",
+        "name": "string"
+      }
+    ]
+  }
+  ```
+
+### Update Product (Logged in users only)
+
+- **Endpoint:** `/products/:id`
+- **Method:** `PUT`
+- **Headers:**
+  ```json
+  {
+    "Authorization": "Bearer <token>"
+  }
+  ```
+- **Body:**
+  ```json
+  {
+    "name": "string",
+    "description": "string",
+    "price": "number",
+    "category": "string",
+    "image": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "Product updated successfully",
+    "product": {
+      "id": "string",
+      "name": "string",
+      "description": "string",
+      "price": "number",
+      "category": "string",
+      "image": "string"
+    }
+  }
+  ```
+
+### Delete Product (Logged in users only)
+
+- **Endpoint:** `/products/:id`
+- **Method:** `DELETE`
+- **Headers:**
+  ```json
+  {
+    "Authorization": "Bearer <token>"
+  }
+  ```
+- **Response:**
+
+  ```json
+  {
+    "message": "Product deleted successfully"
+  }
+  ```
+
+- Books
+- Accessories
+- Electronics
+- Stationery
+- Lab Equipment
+- Software Licenses
 
 ## Admin Routes
 
 ### Get All Users
 
-**Endpoint:** `GET /api/admin/users`
-
-**Headers:**
-
 ```
-Authorization: Bearer jwtToken
-```
+GET /api/admin/users
+Protected Admin Route
 
-**Response:**
-
-```json
-{
-  "users": [
-    {
-      "_id": "userId1",
-      "userName": "exampleUser1",
-      "email": "example1@example.com",
-      "role": "user"
-    },
-    {
-      "_id": "userId2",
-      "userName": "exampleUser2",
-      "email": "example2@example.com",
-      "role": "admin"
-    }
-  ]
+Response: {
+  "users": Array of user objects
 }
 ```
 
-## Environment Variables
+## Error Responses
 
-Make sure to set the following environment variables in your `.env` file:
+All routes may return:
 
 ```
-PORT=5000
-MONGO_URI=your_mongo_connection_string
-JWT_SECRET=your_jwt_secret
+{
+  "message": "error description",
+  "errors": [array of validation errors] // optional
+}
 ```
 
-## Running the Application
+Status codes:
 
-1. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-2. Start the server:
-   ```bash
-   npm start
-   ```
-
-The server will start on the port specified in the `.env` file (default is 5000).
+- 200: Success
+- 400: Bad Request
+- 401: Unauthorized
+- 500: Server Error

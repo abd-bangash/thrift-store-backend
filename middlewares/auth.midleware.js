@@ -1,3 +1,4 @@
+const blackListModel = require("../models/blackList.model");
 const userModel = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
@@ -5,6 +6,10 @@ module.exports.userAuthMiddleware = async (req, res, next) => {
   try {
     const token = req.cookies.token || req.headers.authorization.split(" ")[1];
     if (!token) return res.status(400).json({ message: "Unauthorized" });
+
+    const blackListed = await blackListModel.findOne({ token });
+    if (blackListed)
+      return res.status(400).json({ message: "Token is invalid or expired" });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 

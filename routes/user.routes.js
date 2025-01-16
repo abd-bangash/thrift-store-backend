@@ -9,19 +9,23 @@ const {
   verifyOtp,
   getUserProfile,
   updateUser,
+  logoutUser,
 } = require("../controllers/user.controller");
 const { userAuthMiddleware } = require("../middlewares/auth.midleware");
 
 router.post(
   "/register",
   [
-    body("email").isEmail().withMessage("Invalid Email"),
     body("userName")
       .isLength({ min: 3 })
-      .withMessage("User name must be atleast 3 characters long"),
+      .withMessage("User name must be at least 3 characters long"),
+    body("email").isEmail().withMessage("Invalid email address"),
     body("password")
       .isLength({ min: 6 })
-      .withMessage("Password must be atleast 6 chracters long"),
+      .withMessage("Password must be at least 6 characters long"),
+    body("phone")
+      .matches(/^\+?[0-9]{10,15}$/)
+      .withMessage("Phone number must be 10–15 digits long"),
   ],
   registerUser
 );
@@ -35,6 +39,8 @@ router.post(
   ],
   loginUser
 );
+
+router.post("/logout", logoutUser);
 
 router.post(
   "/forgot-password",

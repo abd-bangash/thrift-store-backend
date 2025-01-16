@@ -3,25 +3,31 @@ const { validationResult } = require("express-validator");
 const { createUser } = require("../services/user.service");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const blackListModel = require("../models/blackList.model");
 
 //sign up
 module.exports.registerUser = async (req, res, next) => {
   const errors = validationResult(req);
+  console.log(req.body);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    const { userName, email, password, role } = req.body;
+    const { userName, email, password, phone, role } = req.body;
 
     const existingUser = await userModel.findOne({ email });
-    if (existingUser)
-      return res.status(400).json({ error: "email already exists" });
+    const existingPhone = await userModel.findOne({ phone });
+    if (existingUser || existingPhone)
+      return res
+        .status(400)
+        .json({ error: "email or phone number already exists" });
     const hashedPassword = await userModel.hashPassword(password);
 
     const user = await createUser({
       userName,
       email,
       password: hashedPassword,
+      phone,
       role,
     });
 
@@ -32,6 +38,7 @@ module.exports.registerUser = async (req, res, next) => {
       token,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error registering user", error });
   }
 };
@@ -168,5 +175,26 @@ module.exports.updateUser = async (req, res, next) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+//logout controller
+module.exports.logoutUser = async (req, res, next) => {
+  try {
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(400).json({ message: "Not logged in" });
+
+    await blackListModel.create({ token });
+
+    // Clear the token cookie
+    res.clearCookie("token", {
+      httpOnly: true, // Prevent access from JavaScript
+      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+      sameSite: "strict", // Prevent CSRF attacks
+    });
+
+    return res.status(200).json({ message: "User logged out successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
